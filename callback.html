@@ -4,7 +4,7 @@
 <div class="box" id="erro" hidden><p>O TikTok não devolveu o código de autorização.</p><p id="msg"></p></div>
 <script>
 var q=new URLSearchParams(location.search),c=q.get("code");
-if(c&&(q.get("state")||"").indexOf("painel-")===0){location.replace("app.html?code="+encodeURIComponent(c)+"&state="+encodeURIComponent(q.get("state")));}
+if(c&&(q.get("state")||"").indexOf("painel-")===0){location.replace("http://127.0.0.1:8765/app?code="+encodeURIComponent(c)+"&state="+encodeURIComponent(q.get("state")));}
 if(c){document.getElementById("ok").hidden=false;document.getElementById("code").textContent=c;
 document.getElementById("copiar").onclick=function(){navigator.clipboard.writeText(c).then(function(){document.getElementById("copiar").textContent="Copiado"})};}
 else{document.getElementById("erro").hidden=false;document.getElementById("msg").textContent=(q.get("error")||"")+" "+(q.get("error_description")||"");}
