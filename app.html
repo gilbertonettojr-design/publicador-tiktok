@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Publicador Prof. Gilberto Netto · Post to TikTok</title>
+<style>
+:root{--bg:#f4f6fa;--card:#fff;--ink:#14213b;--muted:#5b6a83;--line:#dde3ec;--acc:#fe2c55;--navy:#0c1e3c;--gold:#e9b228;--ok:#0f9d6b;--warn:#b7791f}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1220;--card:#121c31;--ink:#eef2f9;--muted:#9fb0c8;--line:#24324f}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:var(--navy);color:#fff;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+header h1{font-size:18px;margin:0}header small{color:var(--gold);display:block;font-size:12px}
+.acct{display:flex;align-items:center;gap:10px}.acct img{width:36px;height:36px;border-radius:50%;border:2px solid var(--gold)}
+main{max-width:1100px;margin:0 auto;padding:18px;display:grid;grid-template-columns:320px 1fr;gap:18px}
+@media (max-width:820px){main{grid-template-columns:1fr}}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+h2{font-size:16px;margin:0 0 10px}
+ul.q{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;max-height:70vh;overflow:auto}
+ul.q li{border:1px solid var(--line);border-radius:10px;padding:8px 10px;cursor:pointer}
+ul.q li.sel{border-color:var(--acc);box-shadow:0 0 0 2px rgba(254,44,85,.15)}
+ul.q .t{font-weight:600;font-size:13.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ul.q .m{font-size:12px;color:var(--muted);display:flex;justify-content:space-between;gap:6px}
+.badge{font-size:11px;font-weight:700;border-radius:99px;padding:1px 8px}
+.b-sent{background:rgba(15,157,107,.15);color:var(--ok)}.b-appr{background:rgba(233,178,40,.2);color:var(--warn)}.b-pend{background:var(--line);color:var(--muted)}
+.comp{display:grid;grid-template-columns:240px 1fr;gap:18px}@media (max-width:620px){.comp{grid-template-columns:1fr}}
+video{width:100%;border-radius:12px;background:#000;aspect-ratio:9/16}
+label.f{display:block;font-weight:600;margin:12px 0 4px}
+textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px}
+.cnt{font-size:12px;color:var(--muted);text-align:right}
+.chk{display:flex;gap:16px;flex-wrap:wrap}.chk label{display:flex;gap:6px;align-items:center}
+.chk label.dis{opacity:.45}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;font-weight:600}
+.sub{margin:8px 0 0 4px;display:flex;flex-direction:column;gap:6px}.sub[hidden]{display:none}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.decl{font-size:13px;color:var(--muted);margin:14px 0 10px}
+.decl a{color:var(--acc)}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:11px 16px;cursor:pointer}
+button.pri{background:var(--acc);color:#fff}button.sec{background:var(--navy);color:#fff}button.ghost{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.4)}
+button:disabled{opacity:.4;cursor:not-allowed}
+.note{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(233,178,40,.14);font-size:14px}
+.err{background:rgba(254,44,85,.12)}
+.empty{color:var(--muted)}
+</style></head><body>
+<header><div><h1>Publicador Prof. Gilberto Netto</h1><small>Post my own educational videos to TikTok</small></div>
+<div class="acct" id="acct"></div></header>
+<main>
+<section class="box"><h2>My video queue</h2><ul class="q" id="fila"><li class="empty">Loading…</li></ul></section>
+<section class="box" id="painel"><p class="empty">Select a video from the queue.</p></section>
+</main>
+<script>
+const API="http://127.0.0.1:8765", H={"X-Painel":"1"}; let EST=null, FILA=[], SEL=null;
+const PRIV={PUBLIC_TO_EVERYONE:"Everyone",MUTUAL_FOLLOW_FRIENDS:"Friends",FOLLOWER_OF_CREATOR:"Followers",SELF_ONLY:"Only me"};
+const $=s=>document.querySelector(s), esc=t=>String(t??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function get(p){const r=await fetch(API+p,{headers:H});const j=await r.json();if(!r.ok)throw new Error(j.erro||r.status);return j}
+async function post(p,b){const r=await fetch(API+p,{method:"POST",headers:{...H,"Content-Type":"application/json"},body:JSON.stringify(b)});const j=await r.json();if(!r.ok)throw new Error(j.erro||r.status);return j}
+async function login(){const {url}=await get("/api/login-url");location.href=url}
+async function init(){
+  const q=new URLSearchParams(location.search);
+  try{ if(q.get("code")){await post("/api/login",{code:q.get("code"),state:q.get("state")});history.replaceState(null,"",location.pathname)}
+       EST=await get("/api/estado"); }
+  catch(e){$("#acct").innerHTML="";$("#fila").innerHTML='<li class="empty">The local helper is not running on this computer. Open <b>0_TIKTOK_PAINEL.bat</b> and reload this page.</li>';return}
+  if(!EST.conectado){$("#acct").innerHTML='<button class="pri" id="lg">Connect TikTok account</button>';$("#lg").onclick=login;$("#fila").innerHTML='<li class="empty">Connect your TikTok account to continue.</li>';return}
+  const c=EST.creator;
+  $("#acct").innerHTML=`<img alt="" src="${esc(c.creator_avatar_url||EST.user.avatar_url)}"><div><small>Posting to</small><b>${esc(c.creator_nickname||EST.user.display_name)}</b> <span style="opacity:.7">@${esc(c.creator_username||"")}</span></div><button class="ghost" id="sair">Disconnect</button>`;
+  $("#sair").onclick=async()=>{await post("/api/sair",{});location.reload()};
+  await carregar();
+}
+async function carregar(){FILA=(await get("/api/fila")).itens;
+  $("#fila").innerHTML=FILA.map(it=>`<li data-id="${it.id}" class="${SEL==it.id?"sel":""}"><span class="t">${esc(it.legenda.split("\n")[0])}</span><span class="m"><span>${esc(it.id.replace("TT_",""))} · ${esc(it.quando)}</span>${it.enviado?'<span class="badge b-sent">Sent</span>':it.aprovado?'<span class="badge b-appr">Approved</span>':'<span class="badge b-pend">Pending</span>'}</span></li>`).join("");
+  document.querySelectorAll("#fila li[data-id]").forEach(li=>li.onclick=()=>abrir(li.dataset.id));}
+function abrir(id){SEL=id;document.querySelectorAll("#fila li").forEach(li=>li.classList.toggle("sel",li.dataset.id==id));
+  const it=FILA.find(x=>x.id==id), c=EST.creator, opts=c.privacy_level_options||[];
+  $("#painel").innerHTML=`<h2>Post to TikTok</h2>
+  <div class="comp"><div><video id="vid" src="${API}/video/${encodeURIComponent(id)}" controls playsinline></video><p class="hint" id="dur"></p></div>
+  <div>
+   <label class="f" for="tit">Title</label><textarea id="tit" rows="7" maxlength="2200">${esc(it.legenda)}</textarea><div class="cnt"><span id="n"></span>/2200</div>
+   <label class="f" for="priv">Who can view this video</label>
+   <select id="priv"><option value="" selected disabled>Select privacy</option>${opts.map(o=>`<option value="${o}">${PRIV[o]||o}</option>`).join("")}</select>
+   <label class="f">Allow users to</label>
+   <div class="chk">
+    <label class="${c.comment_disabled?"dis":""}" title="${c.comment_disabled?"Comments are turned off in your TikTok settings":""}"><input type="checkbox" id="cm" ${c.comment_disabled?"disabled":""}> Comment</label>
+    <label class="${c.duet_disabled?"dis":""}" title="${c.duet_disabled?"Duet is turned off in your TikTok settings":""}"><input type="checkbox" id="du" ${c.duet_disabled?"disabled":""}> Duet</label>
+    <label class="${c.stitch_disabled?"dis":""}" title="${c.stitch_disabled?"Stitch is turned off in your TikTok settings":""}"><input type="checkbox" id="st" ${c.stitch_disabled?"disabled":""}> Stitch</label>
+   </div>
+   <div class="tog"><span>Disclose video content</span><input type="checkbox" id="disc" role="switch"></div>
+   <p class="hint">Turn on to disclose that this video promotes goods or services in exchange for something of value.</p>
+   <div class="sub" id="discbox" hidden>
+     <label><input type="checkbox" id="yb"> Your brand <span class="hint">— you are promoting yourself or your own business.</span></label>
+     <label><input type="checkbox" id="bc"> Branded content <span class="hint">— you are promoting another brand or a third party.</span></label>
+     <p class="hint" id="lbl"></p>
+   </div>
+   <p class="decl" id="decl"></p>
+   <div class="btns"><button class="pri" id="pub" disabled>Post now</button>${it.enviado?"":`<button class="sec" id="apr" disabled>Approve for ${esc(it.quando)}</button>`}</div>
+   <div id="msg"></div>
+  </div></div>`;
+  const tit=$("#tit"),n=$("#n");const up=()=>n.textContent=tit.value.length;tit.oninput=up;up();
+  $("#vid").onloadedmetadata=e=>{const d=Math.round(e.target.duration),mx=c.max_video_post_duration_sec;$("#dur").textContent=`Duration ${d}s`+(mx?` · max allowed ${mx}s`:"");if(mx&&d>mx){$("#dur").style.color="var(--acc)";bad=true;val()}};
+  let bad=false;
+  ["priv","disc","yb","bc"].forEach(k=>$("#"+k).onchange=val);
+  function val(){const disc=$("#disc").checked,yb=$("#yb").checked,bc=$("#bc").checked;$("#discbox").hidden=!disc;
+    const so=[...$("#priv").options].find(o=>o.value=="SELF_ONLY");
+    if(so){so.disabled=disc&&bc;so.title=so.disabled?"Branded content visibility cannot be set to private.":"";if(so.disabled&&$("#priv").value=="SELF_ONLY")$("#priv").value=""}
+    $("#lbl").textContent=disc?(bc?"Your photo/video will be labeled as 'Paid partnership'":yb?"Your photo/video will be labeled as 'Promotional content'":""):"";
+    $("#decl").innerHTML=disc&&bc?`By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/bc-policy/en" target="_blank">Branded Content Policy</a> and <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank">Music Usage Confirmation</a>.`:`By posting, you agree to TikTok's <a href="https://www.tiktok.com/legal/page/global/music-usage-confirmation/en" target="_blank">Music Usage Confirmation</a>.`;
+    const ok=$("#priv").value&&!(disc&&!yb&&!bc)&&!bad;["pub","apr"].forEach(b=>{const e=$("#"+b);if(e){e.disabled=!ok;e.title=(disc&&!yb&&!bc)?"You need to indicate if your content promotes yourself, a third party, or both.":""}})}
+  val();
+  const cfg=()=>({id,title:tit.value,privacy_level:$("#priv").value,disable_comment:!$("#cm").checked,disable_duet:!$("#du").checked,disable_stitch:!$("#st").checked,brand_organic_toggle:$("#disc").checked&&$("#yb").checked,brand_content_toggle:$("#disc").checked&&$("#bc").checked});
+  $("#pub").onclick=async()=>{$("#pub").disabled=true;msg("Uploading your video to TikTok…");
+    try{const r=await post("/api/publicar",cfg());msg("Your video was sent. It may take a few minutes for it to be processed and visible on your profile.");poll(r.publish_id);carregar()}catch(e){msg("TikTok could not accept the post: "+e.message,true);$("#pub").disabled=false}};
+  if($("#apr"))$("#apr").onclick=async()=>{try{await post("/api/aprovar",cfg());msg(`Approved. It will be posted with these settings at ${it.quando}.`);carregar()}catch(e){msg(e.message,true)}};
+}
+function msg(t,e){$("#msg").innerHTML=`<div class="note ${e?"err":""}">${esc(t)}</div>`}
+async function poll(pid){for(let i=0;i<40;i++){await new Promise(r=>setTimeout(r,6000));try{const s=await get("/api/status/"+pid);
+  if(s.status=="PUBLISH_COMPLETE"){msg("Posted! Your video is now on your TikTok profile.");return}
+  if(s.status=="FAILED"){msg("TikTok reported a problem: "+(s.fail_reason||"failed"),true);return}
+  msg("Processing on TikTok… ("+(s.status||"")+")")}catch(e){}}}
+init();
+</script></body></html>
