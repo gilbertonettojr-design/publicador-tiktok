@@ -1,0 +1,11 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conexão com o TikTok · Publicador Prof. Gilberto Netto</title><link rel="stylesheet" href="base.css"></head><body><main>
+<h1>Conexão com o TikTok</h1>
+<div class="box" id="ok" hidden><p>Autorização recebida. Copie o código abaixo e cole na janela preta do programa no seu computador.</p><p><code id="code"></code></p><button id="copiar" type="button">Copiar código</button></div>
+<div class="box" id="erro" hidden><p>O TikTok não devolveu o código de autorização.</p><p id="msg"></p></div>
+<script>
+var q=new URLSearchParams(location.search),c=q.get("code");
+if(c){document.getElementById("ok").hidden=false;document.getElementById("code").textContent=c;
+document.getElementById("copiar").onclick=function(){navigator.clipboard.writeText(c).then(function(){document.getElementById("copiar").textContent="Copiado"})};}
+else{document.getElementById("erro").hidden=false;document.getElementById("msg").textContent=(q.get("error")||"")+" "+(q.get("error_description")||"");}
+</script>
+</main></body></html>
